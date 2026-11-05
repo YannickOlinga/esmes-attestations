@@ -72,7 +72,6 @@
   .sign-block .school-name { color: var(--grey); }
   .sign-label { font-size: 9.5pt; color: var(--grey); margin-top: 3mm; }
   .sign-img { max-height: 45mm; max-width: 80mm; margin-top: 3mm; display: none; }
-  .campus-photo { position: absolute; left: 50%; transform: translateX(-50%); bottom: 32mm; width: 95mm; height: 95mm; object-fit: cover; border-radius: 3mm; }
   .empty { background: #fff59d; }
 
   /* ---------- Impression ---------- */
@@ -284,8 +283,6 @@
         <img class="sign-img" id="signImg" alt="">
       </div>
 
-      <img class="campus-photo" src="campus.jpg" alt="ESMES Business School – Campus Lyon Part-Dieu">
-
       <div class="foot" data-footer></div>
     </div>
   </div>
@@ -485,7 +482,7 @@
   }
   function applySettings() {
     const s = loadSettings();
-    form.querySelectorAll('[data-persist]').forEach((el) => { if (s[el.name] != null) el.value = s[el.name]; });
+    form.querySelectorAll('[data-persist]').forEach((el) => { if (s[el.name]) el.value = s[el.name]; });
     showLogo(s.logo);
     showSign(s.sign);
   }
