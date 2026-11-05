@@ -43,7 +43,7 @@
   .page {
     width: 210mm; height: 297mm; background: #fff; margin: 0 auto 24px;
     box-shadow: 0 4px 18px rgba(0,0,0,.15);
-    padding: 16mm 20mm 0; position: relative; font-size: 11.5pt; line-height: 1.35;
+    padding: 14mm 20mm 0; position: relative; font-size: 11pt; line-height: 1.3;
   }
   .head { display: flex; align-items: center; gap: 16px; }
   .head .logo { width: 30mm; height: 30mm; flex: none; display: flex; align-items: center; justify-content: center; }
@@ -51,13 +51,13 @@
   .head .school { color: var(--blue); font-weight: bold; font-size: 17pt; letter-spacing: .2px; }
   .head .tag { font-style: italic; color: var(--grey); font-size: 10pt; }
   .head .addr { color: var(--grey); font-size: 10pt; }
-  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 14mm 0 5mm; }
-  .date { text-align: right; margin-bottom: 4mm; }
-  h2.title { text-align: center; color: var(--navy); font-size: 18pt; margin: 0 0 6mm; letter-spacing: .3px; }
-  .page p { margin: 0 0 3mm; }
-  .section-title { color: var(--blue); font-weight: bold; margin: 4mm 0 2mm; }
-  table.info { width: 100%; border-collapse: collapse; margin-bottom: 4mm; font-size: 11pt; }
-  table.info td { border: 1px solid var(--border); padding: 2mm 3mm; vertical-align: top; }
+  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 8mm 0 4mm; }
+  .date { text-align: right; margin-bottom: 3mm; }
+  h2.title { text-align: center; color: var(--navy); font-size: 1.6em; margin: 0 0 5mm; letter-spacing: .3px; }
+  .page p { margin: 0 0 2.5mm; }
+  .section-title { color: var(--blue); font-weight: bold; margin: 3mm 0 2mm; }
+  table.info { width: 100%; border-collapse: collapse; margin-bottom: 3mm; font-size: 0.96em; }
+  table.info td { border: 1px solid var(--border); padding: 1.5mm 3mm; vertical-align: top; }
   table.info td:first-child { width: 47%; background: var(--cell); color: var(--navy); font-weight: bold; }
   .note { font-style: italic; color: var(--grey); }
   a.mail { color: var(--blue); }
@@ -206,7 +206,7 @@
   <!-- ======================= APERÇU ======================= -->
   <div class="preview">
     <!-- Page 1 -->
-    <div class="page">
+    <div class="page" id="page1">
       <div class="head">
         <div class="logo" data-logo></div>
         <div>
@@ -253,7 +253,7 @@
         <tr><td>Référence du virement</td><td data-f="reference"></td></tr>
       </table>
 
-      <p class="note">Sans réception de l'acompte dans ce délai, votre place dans le programme ne pourra pas être garantie.</p>
+      <p class="note" id="lastLine">Sans réception de l'acompte dans ce délai, votre place dans le programme ne pourra pas être garantie.</p>
 
       <div class="foot" data-footer></div>
     </div>
@@ -468,7 +468,23 @@
     document.querySelectorAll('[data-footer]').forEach((el) => (el.innerHTML = footer));
 
     saveSettings();
+    fitPage1();
   }
+
+  // Réduit la taille du texte de la page 1 si le contenu déborde sur le pied de page
+  function fitPage1() {
+    const page = document.getElementById('page1');
+    const last = document.getElementById('lastLine');
+    const foot = page.querySelector('.foot');
+    let size = 11;
+    page.style.fontSize = size + 'pt';
+    const gap = 4 * 96 / 25.4; // 4 mm de marge au-dessus du pied de page
+    while (size > 8 && last.getBoundingClientRect().bottom > foot.getBoundingClientRect().top - gap) {
+      size -= 0.25;
+      page.style.fontSize = size + 'pt';
+    }
+  }
+  window.addEventListener('beforeprint', () => fitPage1());
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 
   // ---------- Paramètres mémorisés (localStorage) ----------
