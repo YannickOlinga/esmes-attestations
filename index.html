@@ -72,6 +72,7 @@
   .sign-block .school-name { color: var(--grey); }
   .sign-label { font-size: 9.5pt; color: var(--grey); margin-top: 3mm; }
   .sign-img { max-height: 45mm; max-width: 80mm; margin-top: 3mm; display: none; }
+  .campus-photo { position: absolute; left: 50%; transform: translateX(-50%); bottom: 32mm; width: 95mm; height: 95mm; object-fit: cover; border-radius: 3mm; }
   .empty { background: #fff59d; }
 
   /* ---------- Impression ---------- */
@@ -175,7 +176,7 @@
         <label>Fonction</label>
         <input name="fonction" data-persist value="Directeur Général">
         <label>N° SIRET</label>
-        <input name="siret" data-persist placeholder="n° SIRET">
+        <input name="siret" data-persist value="994 787 059 00017">
         <label>Catégorie Qualiopi</label>
         <input name="qualiopi" data-persist value="Actions de formation">
         <label>Titulaire du compte</label>
@@ -187,7 +188,7 @@
         <label>Logo de l'école (image)</label>
         <input type="file" accept="image/*" id="logoFile">
         <img class="img-thumb" id="logoThumb" alt="">
-        <div class="hint">Sinon, un logo de remplacement est affiché.</div>
+        <div class="hint">Par défaut : logo officiel ESMES.</div>
         <label>Signature + cachet (image PNG, idéalement fond transparent)</label>
         <input type="file" accept="image/*" id="signFile">
         <img class="img-thumb" id="signThumb" alt="">
@@ -283,6 +284,8 @@
         <img class="sign-img" id="signImg" alt="">
       </div>
 
+      <img class="campus-photo" src="campus.jpg" alt="ESMES Business School – Campus Lyon Part-Dieu">
+
       <div class="foot" data-footer></div>
     </div>
   </div>
@@ -295,24 +298,8 @@
   const STORE = 'esmes-attestation-settings';
   const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
-  // Logo de remplacement (sceau bleu ESMES)
-  const DEFAULT_LOGO = `
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <defs><radialGradient id="g" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#2f6bff"/><stop offset="1" stop-color="#0b3bbf"/></radialGradient></defs>
-      <path fill="url(#g)" d="${scallop(50,50,48,44,20)}"/>
-      <circle cx="50" cy="50" r="36" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/>
-      <text x="50" y="54" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="14" fill="#fff" letter-spacing="1">ESMES</text>
-      <text x="50" y="64" text-anchor="middle" font-family="Arial" font-size="4.5" fill="#fff">BUSINESS SCHOOL</text>
-    </svg>`;
-  function scallop(cx, cy, R, r, n) {
-    let d = '';
-    for (let i = 0; i <= n * 2; i++) {
-      const a = (Math.PI * i) / n - Math.PI / 2;
-      const rad = i % 2 ? r : R;
-      d += (i ? 'L' : 'M') + (cx + rad * Math.cos(a)).toFixed(2) + ',' + (cy + rad * Math.sin(a)).toFixed(2);
-    }
-    return d + 'Z';
-  }
+  // Logo officiel ESMES (fichier logo.png du dépôt)
+  const DEFAULT_LOGO = '<img src="logo.png" alt="ESMES Business School">';
 
   // ---------- Catalogue des formations (source : esmes-lyon.com/nos-formations) ----------
   // Chaque spécialité Bachelor existe en Bac+1, Bac+2 et Bac+3 (Bachelor 1, 2, 3).
