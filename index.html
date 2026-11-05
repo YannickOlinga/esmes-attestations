@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESMES – Générateur d'attestation d'admission</title>
+<style>
+  :root {
+    --blue: #1a4fd6;
+    --navy: #0d2a8a;
+    --gold: #f5c400;
+    --cell: #eef2fb;
+    --border: #d5dbe8;
+    --text: #222;
+    --grey: #555;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #e9ecf2; color: var(--text); }
+
+  /* ---------- Layout application ---------- */
+  .app { display: grid; grid-template-columns: 430px 1fr; height: 100vh; }
+  .panel { background: #fff; overflow-y: auto; padding: 20px 22px 40px; border-right: 1px solid #ccd; }
+  .panel h1 { font-size: 18px; color: var(--navy); margin: 0 0 4px; }
+  .panel .sub { font-size: 12px; color: #777; margin-bottom: 16px; }
+  fieldset { border: 1px solid #dde; border-radius: 8px; margin: 0 0 16px; padding: 10px 14px 14px; }
+  legend { font-weight: bold; color: var(--blue); font-size: 13px; padding: 0 6px; }
+  label { display: block; font-size: 12px; color: #444; margin: 8px 0 3px; }
+  input, select { width: 100%; padding: 7px 9px; border: 1px solid #c8cdd8; border-radius: 5px; font-size: 13px; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px #1a4fd622; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .actions { position: sticky; bottom: -40px; background: #fff; padding: 12px 0; display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid #eee; }
+  button { padding: 10px 14px; border: 0; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+  .btn-primary { background: var(--blue); color: #fff; flex: 1; }
+  .btn-primary:hover { background: var(--navy); }
+  .btn-light { background: #eef1f7; color: #333; }
+  .btn-light:hover { background: #dfe4ee; }
+  .hint { font-size: 11px; color: #888; margin-top: 3px; }
+  .img-thumb { max-height: 40px; margin-top: 5px; display: none; }
+  details summary { cursor: pointer; font-weight: bold; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+  .preview { overflow-y: auto; padding: 30px 0; }
+
+  /* ---------- Page A4 ---------- */
+  .page {
+    width: 210mm; height: 297mm; background: #fff; margin: 0 auto 24px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.15);
+    padding: 16mm 20mm 0; position: relative; font-size: 11.5pt; line-height: 1.35;
+  }
+  .head { display: flex; align-items: center; gap: 16px; }
+  .head .logo { width: 30mm; height: 30mm; flex: none; display: flex; align-items: center; justify-content: center; }
+  .head .logo img, .head .logo svg { max-width: 100%; max-height: 100%; }
+  .head .school { color: var(--blue); font-weight: bold; font-size: 17pt; letter-spacing: .2px; }
+  .head .tag { font-style: italic; color: var(--grey); font-size: 10pt; }
+  .head .addr { color: var(--grey); font-size: 10pt; }
+  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 14mm 0 5mm; }
+  .date { text-align: right; margin-bottom: 4mm; }
+  h2.title { text-align: center; color: var(--navy); font-size: 18pt; margin: 0 0 6mm; letter-spacing: .3px; }
+  .page p { margin: 0 0 3mm; }
+  .section-title { color: var(--blue); font-weight: bold; margin: 4mm 0 2mm; }
+  table.info { width: 100%; border-collapse: collapse; margin-bottom: 4mm; font-size: 11pt; }
+  table.info td { border: 1px solid var(--border); padding: 2mm 3mm; vertical-align: top; }
+  table.info td:first-child { width: 47%; background: var(--cell); color: var(--navy); font-weight: bold; }
+  .note { font-style: italic; color: var(--grey); }
+  a.mail { color: var(--blue); }
+  .foot {
+    position: absolute; left: 20mm; right: 20mm; bottom: 12mm;
+    border-top: 2px solid var(--gold); padding-top: 2mm;
+    text-align: center; font-size: 8.5pt; color: var(--grey); line-height: 1.3;
+  }
+  .page2-body { margin-top: 14mm; }
+  .sign-block { line-height: 1.25; margin-top: 4mm; }
+  .sign-block .name { font-weight: bold; }
+  .sign-block .school-name { color: var(--grey); }
+  .sign-label { font-size: 9.5pt; color: var(--grey); margin-top: 3mm; }
+  .sign-img { max-height: 45mm; max-width: 80mm; margin-top: 3mm; display: none; }
+  .empty { background: #fff59d; }
+
+  /* ---------- Impression ---------- */
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: #fff; }
+    .app { display: block; height: auto; }
+    .panel { display: none; }
+    .preview { padding: 0; overflow: visible; }
+    .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+    .page:last-child { page-break-after: auto; break-after: auto; }
+    .empty { background: transparent; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ======================= FORMULAIRE ======================= -->
+  <form class="panel" id="form" autocomplete="off" onsubmit="return false">
+    <h1>Attestation d'admission</h1>
+    <div class="sub">ESMES Business School · Campus Lyon Part-Dieu. Remplissez le formulaire : l'aperçu se met à jour en direct.</div>
+
+    <fieldset>
+      <legend>Étudiant</legend>
+      <div class="row">
+        <div>
+          <label>Civilité</label>
+          <select name="civilite">
+            <option>Madame</option>
+            <option>Monsieur</option>
+          </select>
+        </div>
+        <div>
+          <label>Nationalité</label>
+          <input name="nationalite" placeholder="ex. : Camerounaise">
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Prénom</label><input name="prenom" placeholder="Prénom"></div>
+        <div><label>Nom</label><input name="nom" placeholder="NOM"></div>
+      </div>
+      <div class="row">
+        <div><label>Date de naissance</label><input type="date" name="naissance"></div>
+        <div>
+          <label>N° de dossier</label>
+          <input name="dossier" placeholder="ESMES-2026-0001">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Admission</legend>
+      <label>Formation</label>
+      <select name="formation" id="formation"></select>
+      <div id="autreWrap" style="display:none">
+        <label>Intitulé du programme</label>
+        <input name="programmeLibre" placeholder="ex. : Bachelor Marketing Digital">
+      </div>
+      <div class="row">
+        <div>
+          <label>Niveau</label>
+          <select name="niveau"></select>
+        </div>
+        <div id="anneeWrap">
+          <label>Année d'admission</label>
+          <select name="anneeEntree"></select>
+        </div>
+      </div>
+      <label>N° RNCP</label>
+      <input name="rncp" placeholder="ex. : 36122">
+      <div class="hint">Mémorisé pour chaque formation : à saisir une seule fois.</div>
+      <div class="row">
+        <div>
+          <label>Rythme</label>
+          <select name="rythme">
+            <option>Formation initiale</option>
+            <option>Alternance</option>
+          </select>
+        </div>
+        <div><label>Année académique</label><input name="annee" value="2026-2027"></div>
+      </div>
+      <div class="row">
+        <div><label>Date de rentrée</label><input type="date" name="rentree" value="2027-01-12"></div>
+        <div><label>Date de la lettre</label><input type="date" name="dateLettre"></div>
+      </div>
+      <div class="row">
+        <div><label>Frais de scolarité annuels (€)</label><input type="number" name="frais" min="0" step="1" placeholder="ex. : 6900"></div>
+        <div><label>Acompte de réservation (€)</label><input type="number" name="acompte" min="0" step="1" placeholder="ex. : 2000"></div>
+      </div>
+      <label>Date limite de paiement de l'acompte</label>
+      <input type="date" name="dateLimite">
+    </fieldset>
+
+    <fieldset>
+      <details>
+        <summary>Paramètres de l'école (mémorisés)</summary>
+        <label>Signataire (Prénom NOM)</label>
+        <input name="signataire" data-persist placeholder="Prénom NOM">
+        <label>Fonction</label>
+        <input name="fonction" data-persist value="Directeur Général">
+        <label>N° SIRET</label>
+        <input name="siret" data-persist placeholder="n° SIRET">
+        <label>Catégorie Qualiopi</label>
+        <input name="qualiopi" data-persist value="Actions de formation">
+        <label>Titulaire du compte</label>
+        <input name="titulaire" data-persist value="GROUPE FRANCE PREPA ACADEMY">
+        <label>IBAN</label>
+        <input name="iban" data-persist value="FR76 3000 4004 6800 0103 2072 258">
+        <label>BIC</label>
+        <input name="bic" data-persist value="BNPAFRPPXXX">
+        <label>Logo de l'école (image)</label>
+        <input type="file" accept="image/*" id="logoFile">
+        <img class="img-thumb" id="logoThumb" alt="">
+        <div class="hint">Sinon, un logo de remplacement est affiché.</div>
+        <label>Signature + cachet (image PNG, idéalement fond transparent)</label>
+        <input type="file" accept="image/*" id="signFile">
+        <img class="img-thumb" id="signThumb" alt="">
+        <div style="margin-top:8px">
+          <button type="button" class="btn-light" id="clearImages">Retirer les images</button>
+        </div>
+      </details>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" id="printBtn">🖨️ Imprimer / Enregistrer en PDF</button>
+      <button type="button" class="btn-light" id="resetBtn">Nouvel étudiant</button>
+    </div>
+  </form>
+
+  <!-- ======================= APERÇU ======================= -->
+  <div class="preview">
+    <!-- Page 1 -->
+    <div class="page">
+      <div class="head">
+        <div class="logo" data-logo></div>
+        <div>
+          <div class="school">ESMES BUSINESS SCHOOL</div>
+          <div class="tag">L'école de la start-up · Campus Lyon Part-Dieu,</div>
+          <div class="addr">49, Boulevard Vivier Merle, 69003, Lyon,</div>
+          <div class="addr">Tél. : 0472506587</div>
+        </div>
+      </div>
+      <hr class="gold-line">
+
+      <div class="date">Lyon, le <span data-f="dateLettre"></span></div>
+      <h2 class="title">ATTESTATION D'ADMISSION</h2>
+
+      <p>À l'attention de <b><span data-f="civilite"></span> <span data-f="nomComplet"></span></b></p>
+      <p>Date de naissance : <span data-f="naissance"></span>&nbsp;&nbsp;&nbsp;&nbsp; Nationalité : <span data-f="nationalite"></span></p>
+      <p>Numéro de dossier : <span data-f="dossier"></span></p>
+
+      <p>Nous avons le plaisir de vous informer qu'après étude de votre dossier de candidature et
+      entretien avec notre jury d'admission, vous êtes <b data-f="admis"></b> au sein d'<b>ESMES Business School</b>,
+      campus de Lyon Part-Dieu.</p>
+
+      <div class="section-title">Détails de votre admission :</div>
+      <table class="info">
+        <tr><td>Programme</td><td data-f="programme"></td></tr>
+        <tr><td>Niveau et certification</td><td><span data-f="niveau"></span> – titre inscrit au RNCP n° <span data-f="rncp"></span></td></tr>
+        <tr><td>Rythme</td><td data-f="rythme"></td></tr>
+        <tr><td>Année académique</td><td data-f="annee"></td></tr>
+        <tr><td>Date de rentrée</td><td data-f="rentree"></td></tr>
+        <tr><td>Campus</td><td>Lyon Part-Dieu – Tour Apicil, 49 boulevard Vivier Merle, 69003 Lyon</td></tr>
+        <tr><td>Frais de scolarité annuels</td><td><span data-f="frais"></span> €</td></tr>
+        <tr><td>Acompte de réservation</td><td><span data-f="acompte"></span> €</td></tr>
+      </table>
+
+      <p>Pour confirmer votre inscription et recevoir votre <b>attestation d'inscription définitive</b> (nécessaire
+      notamment pour les démarches de visa), merci de régler l'acompte avant le <span data-f="dateLimite"></span> par
+      virement bancaire, puis de nous transmettre la preuve de virement à <a class="mail" href="mailto:contact@esmes-lyon.com">contact@esmes-lyon.com</a>.</p>
+
+      <table class="info">
+        <tr><td>Titulaire du compte</td><td data-f="titulaire"></td></tr>
+        <tr><td>Banque</td><td>BNP PARIBAS</td></tr>
+        <tr><td>IBAN</td><td data-f="iban"></td></tr>
+        <tr><td>BIC</td><td data-f="bic"></td></tr>
+        <tr><td>Référence du virement</td><td data-f="reference"></td></tr>
+      </table>
+
+      <p class="note">Sans réception de l'acompte dans ce délai, votre place dans le programme ne pourra pas être garantie.</p>
+
+      <div class="foot" data-footer></div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page">
+      <div class="head">
+        <div class="logo" data-logo></div>
+        <div>
+          <div class="school">ESMES BUSINESS SCHOOL</div>
+          <div class="tag">L'école de la start-up · Campus Lyon Part-Dieu,</div>
+          <div class="addr">49, Boulevard Vivier Merle, 69003, Lyon,</div>
+          <div class="addr">Tél. : 0472506587</div>
+        </div>
+      </div>
+
+      <div class="page2-body">
+        <p>Toute l'équipe d'ESMES Business School se réjouit de vous accueillir et reste à votre disposition
+        pour toute question.</p>
+        <p>Fait à Lyon, pour valoir ce que de droit.</p>
+        <div class="sign-block">
+          <div class="name" data-f="signataire"></div>
+          <div data-f="fonction"></div>
+          <div class="school-name">ESMES Business School</div>
+        </div>
+        <div class="sign-label">Signature et cachet de l'école :</div>
+        <img class="sign-img" id="signImg" alt="">
+      </div>
+
+      <div class="foot" data-footer></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const form = document.getElementById('form');
+  const $ = (n) => form.elements[n];
+  const STORE = 'esmes-attestation-settings';
+  const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+  // Logo de remplacement (sceau bleu ESMES)
+  const DEFAULT_LOGO = `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="g" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#2f6bff"/><stop offset="1" stop-color="#0b3bbf"/></radialGradient></defs>
+      <path fill="url(#g)" d="${scallop(50,50,48,44,20)}"/>
+      <circle cx="50" cy="50" r="36" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/>
+      <text x="50" y="54" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="14" fill="#fff" letter-spacing="1">ESMES</text>
+      <text x="50" y="64" text-anchor="middle" font-family="Arial" font-size="4.5" fill="#fff">BUSINESS SCHOOL</text>
+    </svg>`;
+  function scallop(cx, cy, R, r, n) {
+    let d = '';
+    for (let i = 0; i <= n * 2; i++) {
+      const a = (Math.PI * i) / n - Math.PI / 2;
+      const rad = i % 2 ? r : R;
+      d += (i ? 'L' : 'M') + (cx + rad * Math.cos(a)).toFixed(2) + ',' + (cy + rad * Math.sin(a)).toFixed(2);
+    }
+    return d + 'Z';
+  }
+
+  // ---------- Catalogue des formations (source : esmes-lyon.com/nos-formations) ----------
+  // Chaque spécialité Bachelor existe en Bac+1, Bac+2 et Bac+3 (Bachelor 1, 2, 3).
+  const BACHELOR_LEVELS = ['Bac+1', 'Bac+2', 'Bac+3'];
+  const SPECIALITES_BACHELOR = [
+    'Management des Ressources Humaines',
+    'Business International',
+    'Marketing Digital et Communication',
+    'Comptabilité et Finance',
+    'Négociation et Relation Client',
+    'Informatique',
+    'Start-up Management',
+    'Entrepreneuriat Social',
+  ];
+  const FORMATIONS = [
+    { group: 'Bachelors – Bac+1 / Bac+2 / Bac+3', items: SPECIALITES_BACHELOR.map((sp) => (
+      { id: 'Bachelor en ' + sp, type: 'bachelor', spec: sp, levels: BACHELOR_LEVELS, rythme: 'Alternance' })) },
+    { group: 'Bachelors Open – Bac+1 / Bac+2', items: [
+      { id: 'Bachelor Open en Informatique', type: 'open', spec: 'Informatique', levels: ['Bac+1', 'Bac+2'], rythme: 'Formation initiale' },
+      { id: 'Bachelor Open en Management, Commerce et Gestion des Entreprises', type: 'open', spec: 'Management, Commerce et Gestion des Entreprises', levels: ['Bac+1', 'Bac+2'], rythme: 'Formation initiale' },
+    ]},
+    { group: 'Masters – Bac+5', items: [
+      ['Management, Commerce et Entrepreneuriat', 'Alternance'],
+      ['Management des Ressources Humaines', 'Alternance'],
+      ['Responsabilité Sociale des Entreprises', 'Alternance'],
+      ['Finance Conseil', 'Formation initiale'],
+      ['Gestion de la Supply Chain', 'Formation initiale'],
+      ['Développement Fullstack', 'Formation initiale'],
+      ['Management de la Santé', 'Alternance'],
+      ['Comptabilité', 'Alternance'],
+    ].map(([sp, r]) => ({ id: 'Master en ' + sp, type: 'master', spec: sp, levels: ['Bac+5'], rythme: r })) },
+  ];
+  const ALL_LEVELS = ['Bac+1', 'Bac+2', 'Bac+3', 'Bac+5'];
+  const ANNEES = {
+    'Bac+2': ['1re année', '2e année'],
+    'Bac+3': ['1re année', '2e année', '3e année'],
+    'Bac+5': ['1re année (M1)', '2e année (M2)'],
+  };
+  const AUTRE = '__autre__';
+
+  function buildFormations() {
+    const sel = $('formation');
+    sel.innerHTML = '<option value="">— Choisir une formation —</option>' +
+      FORMATIONS.map((g) => `<optgroup label="${g.group}">` +
+        g.items.map((f) => `<option value="${f.id}">${f.id}</option>`).join('') + '</optgroup>').join('') +
+      `<option value="${AUTRE}">Autre (saisie libre)…</option>`;
+  }
+  const findFormation = (id) => {
+    for (const g of FORMATIONS) for (const f of g.items) if (f.id === id) return f;
+    return null;
+  };
+  function buildNiveaux(defaultLevel) {
+    const sel = $('niveau');
+    const prev = sel.value;
+    const f = findFormation($('formation').value);
+    const levels = f ? f.levels : ALL_LEVELS;
+    sel.innerHTML = levels.map((l) => `<option>${l}</option>`).join('');
+    sel.value = levels.includes(prev) ? prev : (defaultLevel && levels.includes(defaultLevel) ? defaultLevel : levels[levels.length - 1]);
+  }
+  // L'année n'est demandée que pour les Masters (M1/M2) et la saisie libre :
+  // pour un Bachelor, le niveau Bac+N correspond directement au Bachelor N.
+  function buildAnnees(keep) {
+    const sel = $('anneeEntree');
+    const prev = keep ? sel.value : '';
+    const f = findFormation($('formation').value);
+    const show = !f || f.type === 'master';
+    document.getElementById('anneeWrap').style.visibility = show ? 'visible' : 'hidden';
+    const opts = show ? (ANNEES[$('niveau').value] || []) : [];
+    sel.innerHTML = '<option value="">— Non précisée —</option>' + opts.map((a) => `<option>${a}</option>`).join('');
+    if (opts.includes(prev)) sel.value = prev;
+  }
+  function onFormationChange() {
+    const v = $('formation').value;
+    document.getElementById('autreWrap').style.display = v === AUTRE ? 'block' : 'none';
+    const f = findFormation(v);
+    if (f) $('rythme').value = f.rythme;
+    buildNiveaux();
+    buildAnnees(false);
+    const s = loadSettings();
+    $('rncp').value = (s.rncp && s.rncp[programmeKey()]) || '';
+  }
+  // Intitulé imprimé dans la ligne « Programme »
+  function programmeLabel() {
+    const v = $('formation').value;
+    const an = $('anneeEntree').value;
+    if (v === AUTRE) { const t = $('programmeLibre').value.trim(); return t ? t + (an ? ' – ' + an : '') : ''; }
+    const f = findFormation(v);
+    if (!f) return '';
+    const n = $('niveau').value.replace('Bac+', '');
+    if (f.type === 'bachelor') return `Bachelor ${n} – ${f.spec}`;
+    if (f.type === 'open') return `Bachelor Open ${n} – ${f.spec}`;
+    if (an) return `Master ${an.includes('M1') ? 1 : 2} – ${f.spec}`;
+    return `Master en ${f.spec}`;
+  }
+  const programmeKey = () => $('formation').value === AUTRE ? $('programmeLibre').value.trim() : $('formation').value;
+  function rememberRncp() {
+    const key = programmeKey();
+    if (!key) return;
+    const s = loadSettings();
+    s.rncp = s.rncp || {};
+    s.rncp[key] = $('rncp').value.trim();
+    localStorage.setItem(STORE, JSON.stringify(s));
+  }
+
+  // ---------- Formatage ----------
+  const fmtDateLong = (v) => { if (!v) return ''; const [y,m,d] = v.split('-'); return `${parseInt(d,10)} ${MONTHS[parseInt(m,10)-1]} ${y}`; };
+  const fmtDateShort = (v) => { if (!v) return ''; const [y,m,d] = v.split('-'); return `${d}/${m}/${y}`; };
+  const fmtMoney = (v) => v === '' || v == null ? '' : Number(v).toLocaleString('fr-FR').replace(/ | /g, ' ');
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  function set(field, value, placeholder) {
+    document.querySelectorAll(`[data-f="${field}"]`).forEach((el) => {
+      el.textContent = value || placeholder;
+      el.classList.toggle('empty', !value);
+    });
+  }
+
+  // ---------- Rendu ----------
+  function render() {
+    const prenom = $('prenom').value.trim();
+    const nom = $('nom').value.trim().toUpperCase();
+    const civ = $('civilite').value;
+
+    set('dateLettre', fmtDateLong($('dateLettre').value), '[date]');
+    set('civilite', civ, '');
+    set('nomComplet', [prenom, nom].filter(Boolean).join(' '), '[Prénom NOM]');
+    set('naissance', fmtDateShort($('naissance').value), '[JJ/MM/AAAA]');
+    set('nationalite', $('nationalite').value.trim(), '[nationalité]');
+    set('dossier', $('dossier').value.trim(), '[référence]');
+    set('admis', civ === 'Madame' ? 'admise' : 'admis', '');
+    set('programme', programmeLabel(), '[Programme]');
+    set('niveau', $('niveau').value, '');
+    set('rncp', $('rncp').value.trim(), '[numéro]');
+    set('rythme', $('rythme').value, '');
+    set('annee', $('annee').value.trim(), '[année]');
+    set('rentree', fmtDateLong($('rentree').value), '[date de rentrée]');
+    set('frais', fmtMoney($('frais').value), '[montant]');
+    set('acompte', fmtMoney($('acompte').value), '[montant]');
+    set('dateLimite', fmtDateLong($('dateLimite').value), '[date limite]');
+    set('titulaire', $('titulaire').value.trim(), '[titulaire]');
+    set('iban', $('iban').value.trim(), '[IBAN]');
+    set('bic', $('bic').value.trim(), '[BIC]');
+    set('reference', [nom, prenom].filter(Boolean).join(' '), '[NOM Prénom de l\'étudiant]');
+    set('signataire', $('signataire').value.trim(), '[Prénom NOM du signataire]');
+    set('fonction', $('fonction').value.trim(), '[Fonction]');
+
+    const siret = esc($('siret').value.trim());
+    const qualiopi = esc($('qualiopi').value.trim());
+    const footer =
+      `ESMES Business School · Campus Lyon Part-Dieu · Tour Apicil, 49 bd Vivier Merle, 69003 Lyon<br>` +
+      `06 72 22 94 73 · contact@esmes-lyon.com · www.esmes-lyon.com · SIRET : ${siret || '<span class="empty">[n° SIRET]</span>'}<br>` +
+      `Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}`;
+    document.querySelectorAll('[data-footer]').forEach((el) => (el.innerHTML = footer));
+
+    saveSettings();
+  }
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  // ---------- Paramètres mémorisés (localStorage) ----------
+  function loadSettings() {
+    try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; }
+  }
+  function saveSettings() {
+    const s = loadSettings();
+    form.querySelectorAll('[data-persist]').forEach((el) => (s[el.name] = el.value));
+    try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) { console.warn(e); }
+  }
+  function applySettings() {
+    const s = loadSettings();
+    form.querySelectorAll('[data-persist]').forEach((el) => { if (s[el.name] != null) el.value = s[el.name]; });
+    showLogo(s.logo);
+    showSign(s.sign);
+  }
+
+  function showLogo(src) {
+    document.querySelectorAll('[data-logo]').forEach((el) => {
+      el.innerHTML = src ? `<img src="${src}" alt="Logo">` : DEFAULT_LOGO;
+    });
+    const t = document.getElementById('logoThumb');
+    t.src = src || ''; t.style.display = src ? 'block' : 'none';
+  }
+  function showSign(src) {
+    const img = document.getElementById('signImg');
+    img.src = src || ''; img.style.display = src ? 'block' : 'none';
+    const t = document.getElementById('signThumb');
+    t.src = src || ''; t.style.display = src ? 'block' : 'none';
+  }
+  function readImage(input, key, cb) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const s = loadSettings(); s[key] = reader.result;
+      try { localStorage.setItem(STORE, JSON.stringify(s)); }
+      catch { alert("Image trop lourde pour être mémorisée : elle sera utilisée uniquement pour cette session."); }
+      cb(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---------- Numéro de dossier auto ----------
+  function nextDossier() {
+    const year = new Date().getFullYear();
+    const s = loadSettings();
+    const n = (s.counter || 0) + 1;
+    return { value: `ESMES-LYO-${year}-${String(n).padStart(4, '0')}`, n };
+  }
+  function initStudent() {
+    $('dateLettre').value = today();
+    const nd = nextDossier();
+    $('dossier').value = nd.value;
+    $('dossier').dataset.n = nd.n;
+  }
+
+  // ---------- Événements ----------
+  $('formation').addEventListener('change', onFormationChange);
+  $('niveau').addEventListener('change', () => buildAnnees(true));
+  $('rncp').addEventListener('input', rememberRncp);
+  $('programmeLibre').addEventListener('change', () => {
+    const s = loadSettings();
+    $('rncp').value = (s.rncp && s.rncp[programmeKey()]) || $('rncp').value;
+  });
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+
+  document.getElementById('logoFile').addEventListener('change', (e) => readImage(e.target, 'logo', showLogo));
+  document.getElementById('signFile').addEventListener('change', (e) => readImage(e.target, 'sign', showSign));
+  document.getElementById('clearImages').addEventListener('click', () => {
+    const s = loadSettings(); delete s.logo; delete s.sign;
+    localStorage.setItem(STORE, JSON.stringify(s));
+    document.getElementById('logoFile').value = '';
+    document.getElementById('signFile').value = '';
+    showLogo(null); showSign(null);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', () => {
+    const missing = [];
+    if (!$('prenom').value.trim() || !$('nom').value.trim()) missing.push('nom / prénom');
+    if (!programmeKey()) missing.push('formation');
+    if (!$('acompte').value) missing.push('acompte');
+    if (!$('dateLimite').value) missing.push('date limite');
+    if (missing.length && !confirm('Champs manquants : ' + missing.join(', ') + '.\nImprimer quand même ?')) return;
+
+    // Incrémente le compteur de dossiers si le numéro auto a été utilisé
+    const s = loadSettings();
+    const n = parseInt($('dossier').dataset.n, 10);
+    if (n && n > (s.counter || 0)) { s.counter = n; localStorage.setItem(STORE, JSON.stringify(s)); }
+
+    const prev = document.title;
+    document.title = `Attestation admission - ${$('nom').value.trim().toUpperCase()} ${$('prenom').value.trim()}`.trim();
+    window.print();
+    document.title = prev;
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    ['prenom','nom','naissance','nationalite','formation','programmeLibre','rncp','frais','acompte','dateLimite'].forEach((n) => ($(n).value = ''));
+    onFormationChange();
+    initStudent();
+    render();
+  });
+
+  // ---------- Init ----------
+  buildFormations();
+  buildNiveaux('Bac+3');
+  buildAnnees(false);
+  applySettings();
+  initStudent();
+  render();
+})();
+</script>
+</body>
+</html>
