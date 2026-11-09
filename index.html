@@ -72,7 +72,7 @@
   .sign-block .school-name { color: var(--grey); }
   .sign-zone { width: 75mm; min-height: 32mm; }
   .sign-label { font-size: 0.85em; color: var(--grey); }
-  .sign-img { max-height: 30mm; max-width: 75mm; margin-top: 1mm; display: none; }
+  .sign-img { max-height: 30mm; max-width: 75mm; margin-top: 1mm; display: none; mix-blend-mode: multiply; }
   .empty { background: #fff59d; }
 
   /* ---------- Impression ---------- */
@@ -484,11 +484,16 @@
     const t = document.getElementById('logoThumb');
     t.src = src || ''; t.style.display = src ? 'block' : 'none';
   }
+  // Signature par défaut : fichier signature.jpg à côté de la page (si présent)
+  const DEFAULT_SIGN = 'signature.jpg';
   function showSign(src) {
-    const img = document.getElementById('signImg');
-    img.src = src || ''; img.style.display = src ? 'block' : 'none';
-    const t = document.getElementById('signThumb');
-    t.src = src || ''; t.style.display = src ? 'block' : 'none';
+    const url = src || DEFAULT_SIGN;
+    ['signImg', 'signThumb'].forEach((id) => {
+      const img = document.getElementById(id);
+      img.onload = () => { img.style.display = 'block'; fitPage1(); };
+      img.onerror = () => { img.style.display = 'none'; };
+      img.src = url;
+    });
   }
   function readImage(input, key, cb) {
     const file = input.files[0];
