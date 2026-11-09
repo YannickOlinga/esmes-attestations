@@ -43,15 +43,15 @@
   .page {
     width: 210mm; height: 297mm; background: #fff; margin: 0 auto 24px;
     box-shadow: 0 4px 18px rgba(0,0,0,.15);
-    padding: 14mm 20mm 0; position: relative; font-size: 11pt; line-height: 1.3;
+    padding: 12mm 20mm 0; position: relative; overflow: hidden; font-size: 11pt; line-height: 1.3;
   }
   .head { display: flex; align-items: center; gap: 16px; }
-  .head .logo { width: 30mm; height: 30mm; flex: none; display: flex; align-items: center; justify-content: center; }
+  .head .logo { width: 26mm; height: 26mm; flex: none; display: flex; align-items: center; justify-content: center; }
   .head .logo img, .head .logo svg { max-width: 100%; max-height: 100%; }
   .head .school { color: var(--blue); font-weight: bold; font-size: 17pt; letter-spacing: .2px; }
   .head .tag { font-style: italic; color: var(--grey); font-size: 10pt; }
   .head .addr { color: var(--grey); font-size: 10pt; }
-  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 8mm 0 4mm; }
+  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 5mm 0 3mm; }
   .date { text-align: right; margin-bottom: 3mm; }
   h2.title { text-align: center; color: var(--navy); font-size: 1.6em; margin: 0 0 5mm; letter-spacing: .3px; }
   .page p { margin: 0 0 2.5mm; }
@@ -66,12 +66,13 @@
     border-top: 2px solid var(--gold); padding-top: 2mm;
     text-align: center; font-size: 8.5pt; color: var(--grey); line-height: 1.3;
   }
-  .page2-body { margin-top: 14mm; }
-  .sign-block { line-height: 1.25; margin-top: 4mm; }
+  .sign-row { display: flex; justify-content: space-between; gap: 10mm; margin-top: 3mm; }
+  .sign-block { line-height: 1.25; }
   .sign-block .name { font-weight: bold; }
   .sign-block .school-name { color: var(--grey); }
-  .sign-label { font-size: 9.5pt; color: var(--grey); margin-top: 3mm; }
-  .sign-img { max-height: 45mm; max-width: 80mm; margin-top: 3mm; display: none; }
+  .sign-zone { width: 75mm; min-height: 32mm; }
+  .sign-label { font-size: 0.85em; color: var(--grey); }
+  .sign-img { max-height: 30mm; max-width: 75mm; margin-top: 1mm; display: none; }
   .empty { background: #fff59d; }
 
   /* ---------- Impression ---------- */
@@ -253,34 +254,21 @@
         <tr><td>Référence du virement</td><td data-f="reference"></td></tr>
       </table>
 
-      <p class="note" id="lastLine">Sans réception de l'acompte dans ce délai, votre place dans le programme ne pourra pas être garantie.</p>
+      <p class="note">Sans réception de l'acompte dans ce délai, votre place dans le programme ne pourra pas être garantie.</p>
 
-      <div class="foot" data-footer></div>
-    </div>
+      <p>Toute l'équipe d'ESMES Business School se réjouit de vous accueillir et reste à votre disposition
+      pour toute question. Fait à Lyon, pour valoir ce que de droit.</p>
 
-    <!-- Page 2 -->
-    <div class="page">
-      <div class="head">
-        <div class="logo" data-logo></div>
-        <div>
-          <div class="school">ESMES BUSINESS SCHOOL</div>
-          <div class="tag">L'école de la start-up · Campus Lyon Part-Dieu,</div>
-          <div class="addr">49, Boulevard Vivier Merle, 69003, Lyon,</div>
-          <div class="addr">Tél. : 0472506587</div>
-        </div>
-      </div>
-
-      <div class="page2-body">
-        <p>Toute l'équipe d'ESMES Business School se réjouit de vous accueillir et reste à votre disposition
-        pour toute question.</p>
-        <p>Fait à Lyon, pour valoir ce que de droit.</p>
+      <div class="sign-row" id="lastLine">
         <div class="sign-block">
           <div class="name" data-f="signataire"></div>
           <div data-f="fonction"></div>
           <div class="school-name">ESMES Business School</div>
         </div>
-        <div class="sign-label">Signature et cachet de l'école :</div>
-        <img class="sign-img" id="signImg" alt="">
+        <div class="sign-zone">
+          <div class="sign-label">Signature et cachet de l'école :</div>
+          <img class="sign-img" id="signImg" alt="">
+        </div>
       </div>
 
       <div class="foot" data-footer></div>
