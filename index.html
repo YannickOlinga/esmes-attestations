@@ -172,9 +172,9 @@
       <details>
         <summary>Paramètres de l'école (mémorisés)</summary>
         <label>Signataire (Prénom NOM)</label>
-        <input name="signataire" data-persist placeholder="Prénom NOM">
+        <input name="signataire" data-persist value="Isabelle CHOLET">
         <label>Fonction</label>
-        <input name="fonction" data-persist value="Directeur Général">
+        <input name="fonction" data-persist value="Directrice des admissions">
         <label>N° SIRET</label>
         <input name="siret" data-persist value="994 787 059 00017">
         <label>Catégorie Qualiopi</label>
@@ -470,6 +470,8 @@
   }
   function applySettings() {
     const s = loadSettings();
+    // Ancienne valeur par défaut, remplacée par la nouvelle signataire
+    if (s.fonction === 'Directeur Général' && !s.signataire) delete s.fonction;
     form.querySelectorAll('[data-persist]').forEach((el) => { if (s[el.name]) el.value = s[el.name]; });
     showLogo(s.logo);
     showSign(s.sign);
