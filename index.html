@@ -70,7 +70,9 @@
   .sign-block { line-height: 1.25; }
   .sign-block .name { font-weight: bold; }
   .sign-block .school-name { color: var(--grey); }
-  .sign-zone { width: 75mm; min-height: 32mm; }
+  .sign-zone { width: 75mm; min-height: 32mm; position: relative; }
+  .cachet-img { position: absolute; left: 0; top: 5mm; width: 60mm; mix-blend-mode: multiply; opacity: .9; }
+  .sign-img { position: relative; z-index: 1; }
   .sign-label { font-size: 0.85em; color: var(--grey); }
   .sign-img { max-height: 30mm; max-width: 75mm; margin-top: 1mm; display: none; mix-blend-mode: multiply; }
   .empty { background: #fff59d; }
@@ -143,9 +145,6 @@
           <select name="anneeEntree"></select>
         </div>
       </div>
-      <label>N° RNCP</label>
-      <input name="rncp" placeholder="ex. : 36122">
-      <div class="hint">Mémorisé pour chaque formation : à saisir une seule fois.</div>
       <div class="row">
         <div>
           <label>Rythme</label>
@@ -233,7 +232,7 @@
       <div class="section-title">Détails de votre admission :</div>
       <table class="info">
         <tr><td>Programme</td><td data-f="programme"></td></tr>
-        <tr><td>Niveau et certification</td><td><span data-f="niveau"></span> – titre inscrit au RNCP n° <span data-f="rncp"></span></td></tr>
+        <tr><td>Niveau</td><td data-f="niveau"></td></tr>
         <tr><td>Rythme</td><td data-f="rythme"></td></tr>
         <tr><td>Année académique</td><td data-f="annee"></td></tr>
         <tr><td>Date de rentrée</td><td data-f="rentree"></td></tr>
@@ -267,6 +266,7 @@
         </div>
         <div class="sign-zone">
           <div class="sign-label">Signature et cachet de l'école :</div>
+          <img class="cachet-img" src="cachet.png" alt="" onerror="this.style.display='none'">
           <img class="sign-img" id="signImg" alt="">
         </div>
       </div>
@@ -363,8 +363,6 @@
     if (f) $('rythme').value = f.rythme;
     buildNiveaux();
     buildAnnees(false);
-    const s = loadSettings();
-    $('rncp').value = (s.rncp && s.rncp[programmeKey()]) || '';
   }
   // Intitulé imprimé dans la ligne « Programme »
   function programmeLabel() {
@@ -380,14 +378,6 @@
     return `Master en ${f.spec}`;
   }
   const programmeKey = () => $('formation').value === AUTRE ? $('programmeLibre').value.trim() : $('formation').value;
-  function rememberRncp() {
-    const key = programmeKey();
-    if (!key) return;
-    const s = loadSettings();
-    s.rncp = s.rncp || {};
-    s.rncp[key] = $('rncp').value.trim();
-    localStorage.setItem(STORE, JSON.stringify(s));
-  }
 
   // ---------- Formatage ----------
   const fmtDateLong = (v) => { if (!v) return ''; const [y,m,d] = v.split('-'); return `${parseInt(d,10)} ${MONTHS[parseInt(m,10)-1]} ${y}`; };
@@ -417,7 +407,6 @@
     set('admis', civ === 'Madame' ? 'admise' : 'admis', '');
     set('programme', programmeLabel(), '[Programme]');
     set('niveau', $('niveau').value, '');
-    set('rncp', $('rncp').value.trim(), '[numéro]');
     set('rythme', $('rythme').value, '');
     set('annee', $('annee').value.trim(), '[année]');
     set('rentree', fmtDateLong($('rentree').value), '[date de rentrée]');
@@ -525,11 +514,6 @@
   // ---------- Événements ----------
   $('formation').addEventListener('change', onFormationChange);
   $('niveau').addEventListener('change', () => buildAnnees(true));
-  $('rncp').addEventListener('input', rememberRncp);
-  $('programmeLibre').addEventListener('change', () => {
-    const s = loadSettings();
-    $('rncp').value = (s.rncp && s.rncp[programmeKey()]) || $('rncp').value;
-  });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
 
@@ -563,7 +547,7 @@
   });
 
   document.getElementById('resetBtn').addEventListener('click', () => {
-    ['prenom','nom','naissance','nationalite','formation','programmeLibre','rncp','frais','acompte','dateLimite'].forEach((n) => ($(n).value = ''));
+    ['prenom','nom','naissance','nationalite','formation','programmeLibre','frais','acompte','dateLimite'].forEach((n) => ($(n).value = ''));
     onFormationChange();
     initStudent();
     render();
