@@ -64,8 +64,9 @@
   .foot {
     position: absolute; left: 20mm; right: 20mm; bottom: 12mm;
     border-top: 2px solid var(--gold); padding-top: 2mm;
-    text-align: center; font-size: 8.5pt; color: var(--grey); line-height: 1.3;
+    font-size: 8.5pt; color: var(--grey); line-height: 1.3;
   }
+  .foot .fl { text-align: center; white-space: nowrap; }
   .sign-row { display: flex; justify-content: space-between; gap: 10mm; margin-top: 3mm; }
   .sign-block { line-height: 1.25; }
   .sign-block .name { font-weight: bold; }
@@ -431,12 +432,15 @@
     const nda = esc($('nda').value.trim());
     const naf = esc($('naf').value.trim());
     const cert = esc($('qualiopiCert').value.trim());
-    const footer =
-      `ESMES Business School · Tour Apicil, 49 bd Vivier Merle, 69003 Lyon · ` +
-      `SIREN : ${siren || '<span class="empty">[n° SIREN]</span>'} RCS Lyon<br>` +
-      `Tél : 04-72-50-65-87 · Code NAF : ${naf || '<span class="empty">[code NAF]</span>'} · ` +
-      `Mail : contact@esmes-lyon.com<br>NDA : ${nda || '<span class="empty">[NDA]</span>'} / Préfecture de région Auvergne-Rhône-Alpes<br>` +
-      `www.esmes-lyon.com · Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}${cert ? ' · Certificat ' + cert : ''}`;
+    const ph = (v, label) => v || `<span class="empty">[${label}]</span>`;
+    // Lignes de plus en plus courtes, centrées (effet pyramide)
+    const lines = [
+      ['ESMES Business School', 'Tour Apicil, 49 bd Vivier Merle, 69003 Lyon', `SIREN : ${ph(siren, 'n° SIREN')} RCS Lyon`],
+      ['Tél : 04-72-50-65-87', `Code NAF : ${ph(naf, 'code NAF')}`, 'Mail : contact@esmes-lyon.com'],
+      [`NDA : ${ph(nda, 'NDA')} / Préfecture de région Auvergne-Rhône-Alpes`, 'www.esmes-lyon.com'],
+      [`Organisme certifié Qualiopi : ${ph(qualiopi, 'catégorie')}`].concat(cert ? [`Certificat ${cert}`] : []),
+    ];
+    const footer = lines.map((items) => `<div class="fl">${items.join(' · ')}</div>`).join('');
     document.querySelectorAll('[data-footer]').forEach((el) => (el.innerHTML = footer));
 
     saveSettings();
