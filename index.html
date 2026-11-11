@@ -174,8 +174,8 @@
         <input name="signataire" data-persist value="Isabelle CHOLET">
         <label>Fonction</label>
         <input name="fonction" data-persist value="Directrice des admissions">
-        <label>N° SIRET</label>
-        <input name="siret" data-persist value="994 787 059 00017">
+        <label>N° SIREN (RCS Lyon)</label>
+        <input name="siren" data-persist value="994 787 059">
         <div class="row">
           <div><label>N° déclaration d'activité (NDA)</label><input name="nda" data-persist value="84692671169"></div>
           <div><label>Code NAF</label><input name="naf" data-persist value="8542Z - Enseignement supérieur"></div>
@@ -424,15 +424,16 @@
     set('signataire', $('signataire').value.trim(), '[Prénom NOM du signataire]');
     set('fonction', $('fonction').value.trim(), '[Fonction]');
 
-    const siret = esc($('siret').value.trim());
+    const siren = esc($('siren').value.trim());
     const qualiopi = esc($('qualiopi').value.trim());
     const nda = esc($('nda').value.trim());
     const naf = esc($('naf').value.trim());
     const footer =
-      `ESMES Business School · Campus Lyon Part-Dieu · Tour Apicil, 49 bd Vivier Merle, 69003 Lyon<br>` +
-      `06 72 22 94 73 · contact@esmes-lyon.com · www.esmes-lyon.com · SIRET : ${siret || '<span class="empty">[n° SIRET]</span>'}<br>` +
-      `Code NAF : ${naf || '<span class="empty">[code NAF]</span>'} · Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}<br>` +
-      `Déclaration d'activité enregistrée sous le n° ${nda || '<span class="empty">[NDA]</span>'} auprès du préfet de région Auvergne-Rhône-Alpes. Cet enregistrement ne vaut pas agrément de l'État.`;
+      `ESMES Business School · Tour Apicil, 49 bd Vivier Merle, 69003 Lyon · ` +
+      `SIREN : ${siren || '<span class="empty">[n° SIREN]</span>'} RCS Lyon<br>` +
+      `Tél : 04-72-50-65-87 · Code NAF : ${naf || '<span class="empty">[code NAF]</span>'} · ` +
+      `Mail : contact@esmes-lyon.com<br>NDA : ${nda || '<span class="empty">[NDA]</span>'} / Préfecture de région Auvergne-Rhône-Alpes<br>` +
+      `www.esmes-lyon.com · Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}`;
     document.querySelectorAll('[data-footer]').forEach((el) => (el.innerHTML = footer));
 
     saveSettings();
