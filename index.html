@@ -182,6 +182,8 @@
         </div>
         <label>Catégorie Qualiopi</label>
         <input name="qualiopi" data-persist value="Actions de formation">
+        <label>N° certificat Qualiopi</label>
+        <input name="qualiopiCert" data-persist value="QUA010283">
         <label>Titulaire du compte</label>
         <input name="titulaire" data-persist value="GROUPE FRANCE PREPA ACADEMY">
         <label>IBAN</label>
@@ -428,12 +430,13 @@
     const qualiopi = esc($('qualiopi').value.trim());
     const nda = esc($('nda').value.trim());
     const naf = esc($('naf').value.trim());
+    const cert = esc($('qualiopiCert').value.trim());
     const footer =
       `ESMES Business School · Tour Apicil, 49 bd Vivier Merle, 69003 Lyon · ` +
       `SIREN : ${siren || '<span class="empty">[n° SIREN]</span>'} RCS Lyon<br>` +
       `Tél : 04-72-50-65-87 · Code NAF : ${naf || '<span class="empty">[code NAF]</span>'} · ` +
       `Mail : contact@esmes-lyon.com<br>NDA : ${nda || '<span class="empty">[NDA]</span>'} / Préfecture de région Auvergne-Rhône-Alpes<br>` +
-      `www.esmes-lyon.com · Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}`;
+      `www.esmes-lyon.com · Organisme certifié Qualiopi au titre de la catégorie : ${qualiopi || '<span class="empty">[catégorie]</span>'}${cert ? ' · Certificat ' + cert : ''}`;
     document.querySelectorAll('[data-footer]').forEach((el) => (el.innerHTML = footer));
 
     saveSettings();
