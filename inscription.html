@@ -5,127 +5,461 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ESMES – Attestation d'inscription</title>
 <style>
-:root{--blue:#1a4fd6;--navy:#0d2a8a;--gold:#f5c400;--cell:#eef2fb;--border:#d5dbe8;--text:#222;--grey:#555}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#e9ecf2;color:var(--text)}
-.app{display:grid;grid-template-columns:420px 1fr;min-height:100vh}
-.panel{background:#fff;overflow-y:auto;padding:22px;border-right:1px solid #ccd}
-.panel h1{font-size:19px;color:var(--navy);margin:0 0 5px}
-.sub{font-size:12px;color:#777;margin-bottom:16px;line-height:1.5}
-.back{display:inline-block;color:var(--blue);font-size:12px;text-decoration:none;margin-bottom:14px}
-fieldset{border:1px solid #dde;border-radius:8px;margin:0 0 15px;padding:10px 14px 14px}
-legend{font-weight:bold;color:var(--blue);font-size:13px;padding:0 6px}
-label{display:block;font-size:12px;color:#444;margin:8px 0 3px}
-input,select{width:100%;padding:8px 9px;border:1px solid #c8cdd8;border-radius:5px;font:13px Arial}
-input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px #1a4fd622}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions{position:sticky;bottom:-22px;background:#fff;padding:12px 0;display:flex;gap:8px;border-top:1px solid #eee}
-button{padding:10px 14px;border:0;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer}
-.primary{background:var(--blue);color:#fff;flex:1}.light{background:#eef1f7;color:#333}
-.preview{overflow:auto;padding:30px 0}
-.page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 24px;box-shadow:0 4px 18px #0002;padding:14mm 20mm 30mm;position:relative;font-size:11pt;line-height:1.45}
-.head{display:flex;align-items:center;gap:16px}.logo{width:26mm;height:26mm;flex:none;display:flex;align-items:center;justify-content:center}.logo img{max-width:100%;max-height:100%}
-.school{color:var(--blue);font-weight:bold;font-size:17pt}.tag,.addr{color:var(--grey);font-size:10pt}.tag{font-style:italic}
-.gold{border:0;border-top:2px solid var(--gold);margin:5mm 0 8mm}
-.date{text-align:right;margin-bottom:8mm}
-h2{text-align:center;color:var(--navy);font-size:17pt;margin:0 0 10mm;letter-spacing:.3px}
-p{margin:0 0 5mm}.info{width:100%;border-collapse:collapse;margin:7mm 0;font-size:10.5pt}
-.info td{border:1px solid var(--border);padding:3mm;vertical-align:top}.info td:first-child{width:42%;background:var(--cell);color:var(--navy);font-weight:bold}
-.signature{margin-top:18mm;display:flex;justify-content:flex-end}.signature div{text-align:left;min-width:65mm}
-.signature strong{display:block;margin-bottom:2mm}
-.foot{position:absolute;left:20mm;right:20mm;bottom:12mm;border-top:2px solid var(--gold);padding-top:2mm;text-align:center;font-size:8.5pt;color:var(--grey)}
-.empty{background:#fff59d}
-@page{size:A4;margin:0}
-@media(max-width:900px){.app{display:block}.panel{border-right:0}.preview{padding:15px;overflow:auto}.page{margin:0 auto 20px}}
-@media print{body{background:#fff}.app{display:block}.panel{display:none}.preview{padding:0;overflow:visible}.page{margin:0;box-shadow:none;page-break-after:always;break-after:page}.page:last-child{page-break-after:auto;break-after:auto}.empty{background:transparent}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  :root {
+    --blue: #1a4fd6; --navy: #0d2a8a; --gold: #f5c400;
+    --cell: #eef2fb; --border: #d5dbe8; --text: #222; --grey: #555;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #e9ecf2; color: var(--text); }
+
+  /* ---------- Formulaire ---------- */
+  .app { display: grid; grid-template-columns: 430px 1fr; height: 100vh; }
+  .panel { background: #fff; overflow-y: auto; padding: 20px 22px 40px; border-right: 1px solid #ccd; }
+  .panel h1 { font-size: 18px; color: var(--navy); margin: 0 0 4px; }
+  .panel .sub { font-size: 12px; color: #777; margin-bottom: 16px; }
+  .back { display: inline-block; margin: 0 0 10px; padding: 7px 10px; border-radius: 5px; background: #eef2fb; color: var(--blue); font-size: 12px; font-weight: bold; text-decoration: none; }
+  fieldset { border: 1px solid #dde; border-radius: 8px; margin: 0 0 16px; padding: 10px 14px 14px; }
+  legend { font-weight: bold; color: var(--blue); font-size: 13px; padding: 0 6px; }
+  label { display: block; font-size: 12px; color: #444; margin: 8px 0 3px; }
+  label.check { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: #333; }
+  label.check input { width: auto; margin-top: 2px; }
+  input, select { width: 100%; padding: 7px 9px; border: 1px solid #c8cdd8; border-radius: 5px; font-size: 13px; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px #1a4fd622; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hint { font-size: 11px; color: #888; margin-top: 3px; }
+  details summary { cursor: pointer; font-weight: bold; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+  .actions { position: sticky; bottom: -40px; background: #fff; padding: 12px 0; display: flex; gap: 8px; border-top: 1px solid #eee; }
+  button { padding: 10px 14px; border: 0; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+  .btn-primary { background: var(--blue); color: #fff; flex: 1; }
+  .btn-primary:hover { background: var(--navy); }
+  .btn-light { background: #eef1f7; color: #333; }
+  .preview { overflow-y: auto; padding: 30px 0; }
+
+  /* ---------- Page A4 ---------- */
+  .page {
+    width: 210mm; height: 297mm; background: #fff; margin: 0 auto 24px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.15);
+    padding: 12mm 20mm 0; position: relative; overflow: hidden; font-size: 11pt; line-height: 1.35;
+  }
+  .head { display: flex; align-items: center; gap: 16px; }
+  .head .logo { width: 26mm; height: 26mm; flex: none; display: flex; align-items: center; justify-content: center; }
+  .head .logo img { max-width: 100%; max-height: 100%; }
+  .head .school { color: var(--blue); font-weight: bold; font-size: 17pt; letter-spacing: .2px; }
+  .head .tag { font-style: italic; color: var(--grey); font-size: 10pt; }
+  .head .addr { color: var(--grey); font-size: 10pt; }
+  .gold-line { border: 0; border-top: 2px solid var(--gold); margin: 5mm 0 3mm; }
+  .date { text-align: right; margin-bottom: 3mm; }
+  h2.title { text-align: center; color: var(--navy); font-size: 1.6em; margin: 0 0 5mm; letter-spacing: .3px;
+             border-top: 1.5px solid var(--navy); border-bottom: 1.5px solid var(--navy); padding: 1.5mm 0; }
+  .page p { margin: 0 0 2.5mm; }
+  .page ul { margin: 0 0 3mm; padding-left: 0; list-style: none; }
+  .page li { padding-left: 5mm; position: relative; margin-bottom: .6mm; }
+  .page li::before { content: "-"; position: absolute; left: 0; }
+  .sect { margin: 3mm 0 1mm; }
+  .sect b { font-weight: bold; }
+  .sign-row { display: flex; justify-content: space-between; gap: 10mm; margin-top: 5mm; line-height: 1.3; }
+  .sign-row .name { font-weight: bold; }
+  .sign-zone { position: relative; width: 75mm; height: 32mm; margin: 2mm auto 0; }
+  .cachet-img { position: absolute; left: 0; top: 0; width: 60mm; mix-blend-mode: multiply; opacity: .9; }
+  .sign-img { position: absolute; left: 8mm; top: 0; max-height: 30mm; max-width: 70mm; mix-blend-mode: multiply; z-index: 1; }
+  .foot {
+    position: absolute; left: 20mm; right: 20mm; bottom: 12mm;
+    border-top: 2px solid var(--gold); padding-top: 2mm;
+    font-size: 8.5pt; color: var(--grey); line-height: 1.3;
+  }
+  .foot .fl { text-align: center; white-space: nowrap; }
+  .empty { background: #fff59d; }
+  [hidden] { display: none !important; }
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: #fff; }
+    .app { display: block; height: auto; }
+    .panel { display: none; }
+    .preview { padding: 0; overflow: visible; }
+    .page { margin: 0; box-shadow: none; }
+    .empty { background: transparent; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
 </style>
 </head>
 <body>
 <div class="app">
-<form class="panel" id="form" autocomplete="off" onsubmit="return false">
-<a class="back" href="index.html">← Retour au générateur d'attestation d'admission</a>
-<h1>Attestation d'inscription</h1>
-<div class="sub">Renseignez les informations de l'étudiant inscrit. L'aperçu du document se met à jour automatiquement.</div>
 
-<fieldset><legend>Informations de l'étudiant</legend>
-<div class="row"><div><label>Civilité</label><select name="civilite"><option>Madame</option><option>Monsieur</option></select></div><div><label>Nationalité</label><input name="nationalite" placeholder="Ex. : Camerounaise"></div></div>
-<div class="row"><div><label>Prénom(s)</label><input name="prenom" placeholder="Prénom(s)" required></div><div><label>Nom</label><input name="nom" placeholder="NOM" required></div></div>
-<div class="row"><div><label>Date de naissance</label><input type="date" name="naissance"></div><div><label>Numéro étudiant / dossier</label><input name="numero" placeholder="ESMES-LYO-2026-0001"></div></div>
-</fieldset>
+  <!-- ======================= FORMULAIRE ======================= -->
+  <form class="panel" id="form" autocomplete="off" onsubmit="return false">
+    <a class="back" href="index.html">← Attestation d'admission</a>
+    <h1>Attestation d'inscription</h1>
+    <div class="sub">À délivrer une fois le dossier complet et l'acompte reçu. L'aperçu se met à jour en direct.</div>
 
-<fieldset><legend>Inscription académique</legend>
-<label>Formation / diplôme préparé</label><input name="formation" placeholder="Ex. : Master Développement Fullstack" required>
-<div class="row"><div><label>Niveau</label><select name="niveau"><option>Bac+1</option><option>Bac+2</option><option>Bac+3</option><option>Bac+4</option><option selected>Bac+5</option></select></div><div><label>Année d'étude</label><select name="anneeEtude"><option>1re année</option><option>2e année</option><option>3e année</option><option>4e année</option><option>5e année</option></select></div></div>
-<div class="row"><div><label>Rythme de formation</label><select name="rythme"><option>Formation initiale</option><option>Alternance</option><option>Formation continue</option></select></div><div><label>Année académique</label><input name="annee" value="2026-2027"></div></div>
-<div class="row"><div><label>Date de début de formation</label><input type="date" name="debut"></div><div><label>Date de fin prévue</label><input type="date" name="fin"></div></div>
-<div class="row"><div><label>Date d'inscription</label><input type="date" name="dateInscription"></div><div><label>Date d'émission</label><input type="date" name="dateEmission"></div></div>
-</fieldset>
+    <fieldset>
+      <legend>Étudiant</legend>
+      <div class="row">
+        <div>
+          <label>Civilité</label>
+          <select name="civilite"><option>Madame</option><option>Monsieur</option></select>
+        </div>
+        <div><label>Nationalité</label><input name="nationalite" placeholder="ex. : Camerounaise"></div>
+      </div>
+      <div class="row">
+        <div><label>Prénom(s)</label><input name="prenom" placeholder="Prénom(s)"></div>
+        <div><label>Nom</label><input name="nom" placeholder="NOM"></div>
+      </div>
+    </fieldset>
 
-<fieldset><legend>Établissement et signature</legend>
-<label>Nom du signataire</label><input name="signataire" value="Isabelle CHOLET">
-<label>Fonction</label><input name="fonction" value="Directrice des admissions">
-<label>Adresse de l'établissement</label><input name="adresse" value="49, boulevard Vivier Merle, 69003 Lyon">
-<label>Contact</label><input name="contact" value="04 72 50 65 87 · contact@esmes-lyon.com">
-<label>Numéro SIREN</label><input name="siren" value="994 787 059">
-</fieldset>
-<div class="actions"><button type="button" class="primary" id="print">Imprimer / Enregistrer en PDF</button><button type="button" class="light" id="reset">Réinitialiser</button></div>
-</form>
+    <fieldset>
+      <legend>Programme</legend>
+      <label>Formation</label>
+      <select name="formation" id="formation"></select>
+      <div id="autreWrap" hidden>
+        <label>Intitulé du programme</label>
+        <input name="programmeLibre" placeholder="ex. : Bachelor 2 Informatique">
+      </div>
+      <div class="row">
+        <div><label>Niveau</label><select name="niveau"></select></div>
+        <div id="anneeWrap"><label>Année (Master)</label><select name="anneeMaster"><option value="1">Master 1</option><option value="2">Master 2</option></select></div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Nature de la formation</label>
+          <select name="rythme"><option>Initiale</option><option>Alternance</option></select>
+        </div>
+        <div><label>Langue du programme</label><input name="langue" value="Français"></div>
+      </div>
+      <div class="row">
+        <div><label>Année académique</label><input name="annee" value="2026/2027"></div>
+        <div><label>Durée du programme</label><input name="duree" placeholder="ex. : 3 ans"></div>
+      </div>
+      <div class="row">
+        <div><label>Coût de la formation (€)</label><input type="number" name="cout" min="0" step="1" placeholder="ex. : 8500"></div>
+        <div><label>Acompte payé (€)</label><input type="number" name="acompte" min="0" step="1" value="3000"></div>
+      </div>
+      <label>Titre inscrit au RNCP (laisser vide pour masquer)</label>
+      <input name="rncp" value="RNCP37873 – Concepteur développeur d'applications – France Compétences (francecompetences.fr) Titre à finalité professionnelle de niveau 6">
+    </fieldset>
 
-<main class="preview">
-<section class="page" id="document">
-<header class="head"><div class="logo"><img src="logo.png" alt="Logo ESMES" onerror="this.style.display='none'"></div><div><div class="school">ESMES BUSINESS SCHOOL</div><div class="tag">L'école de la start-up · Campus Lyon Part-Dieu</div><div class="addr">49, boulevard Vivier Merle, 69003 Lyon</div><div class="addr">Tél. : 04 72 50 65 87</div></div></header>
-<hr class="gold">
-<div class="date">Lyon, le <span data-f="dateEmission">[date]</span></div>
-<h2>ATTESTATION D'INSCRIPTION</h2>
-<p>Je soussignée, <strong data-f="signataire">Isabelle CHOLET</strong>, agissant en qualité de <strong data-f="fonction">Directrice des admissions</strong> d'ESMES Business School, atteste que :</p>
-<p><strong><span data-f="civilite">Madame</span> <span data-f="identite">[Prénom NOM]</span></strong>, né(e) le <span data-f="naissance">[date de naissance]</span>, de nationalité <span data-f="nationalite">[nationalité]</span>, identifié(e) sous le numéro étudiant / dossier <strong data-f="numero">[numéro]</strong>,</p>
-<p>est régulièrement inscrit(e) au sein de notre établissement pour suivre la formation suivante au titre de l'année académique indiquée ci-dessous :</p>
-<table class="info">
-<tr><td>Établissement</td><td>ESMES Business School – Campus Lyon Part-Dieu</td></tr>
-<tr><td>Formation / diplôme préparé</td><td data-f="formation">[Formation]</td></tr>
-<tr><td>Niveau</td><td data-f="niveau">Bac+5</td></tr>
-<tr><td>Année d'étude</td><td data-f="anneeEtude">1re année</td></tr>
-<tr><td>Rythme de formation</td><td data-f="rythme">Formation initiale</td></tr>
-<tr><td>Année académique</td><td data-f="annee">2026-2027</td></tr>
-<tr><td>Période de formation</td><td>Du <span data-f="debut">[date de début]</span> au <span data-f="fin">[date de fin]</span></td></tr>
-<tr><td>Date d'inscription</td><td data-f="dateInscription">[date d'inscription]</td></tr>
-</table>
-<p>La présente attestation est délivrée à l'intéressé(e) pour servir et valoir ce que de droit.</p>
-<div class="signature"><div><strong data-f="signataire2">Isabelle CHOLET</strong><span data-f="fonction2">Directrice des admissions</span><br>ESMES Business School</div></div>
-<footer class="foot"><div>ESMES Business School · <span data-f="adresse">49, boulevard Vivier Merle, 69003 Lyon</span></div><div><span data-f="contact">04 72 50 65 87 · contact@esmes-lyon.com</span> · SIREN : <span data-f="siren">994 787 059</span></div></footer>
-</section>
-</main>
+    <fieldset>
+      <legend>Admission et inscription</legend>
+      <label class="check"><input type="checkbox" name="pDossier" checked> Analyse du dossier d'admission et des pièces demandées</label>
+      <label class="check"><input type="checkbox" name="pTest" checked> Test d'admission</label>
+      <label class="check"><input type="checkbox" name="pEntretien" checked> Entretien de motivation avec la responsable des admissions</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Rentrée et arrivée</legend>
+      <div class="row">
+        <div><label>Début de l'année universitaire</label><input type="date" name="rentree" value="2027-01-12"></div>
+        <div><label>Arrivée au plus tard le</label><input type="date" name="arriveeMax"></div>
+      </div>
+      <label class="check"><input type="checkbox" name="remboursement" checked> Acompte remboursé en cas de refus de visa (sur justificatif du Consulat)</label>
+      <label class="check"><input type="checkbox" name="logement"> Mentionner le service logement</label>
+      <label>Date du document</label>
+      <input type="date" name="dateDoc">
+    </fieldset>
+
+    <fieldset>
+      <details>
+        <summary>Signataire et contact (mémorisés)</summary>
+        <label>Signataire (Prénom NOM)</label>
+        <input name="signataire" data-persist value="Isabelle CHOLET">
+        <div class="row">
+          <div><label>Accord</label><select name="soussigne" data-persist><option value="Je soussignée">Je soussignée</option><option value="Je soussigné">Je soussigné</option></select></div>
+          <div><label>Fonction</label><input name="fonction" data-persist value="Directrice des admissions"></div>
+        </div>
+        <div class="row">
+          <div><label>E-mail</label><input name="sigMail" data-persist value="admissions@esmes-lyon.com"></div>
+          <div><label>Téléphone</label><input name="sigTel" data-persist value="04 72 50 65 87"></div>
+        </div>
+        <label>« Votre contact » (laisser vide pour masquer)</label>
+        <input name="ctNom" data-persist placeholder="Prénom NOM">
+        <input name="ctFonction" data-persist placeholder="Fonction" style="margin-top:6px">
+        <div class="row" style="margin-top:6px">
+          <input name="ctMail" data-persist placeholder="E-mail">
+          <input name="ctTel" data-persist placeholder="Téléphone / WhatsApp">
+        </div>
+      </details>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" id="printBtn">🖨️ Imprimer / Enregistrer en PDF</button>
+      <button type="button" class="btn-light" id="resetBtn">Nouvel étudiant</button>
+    </div>
+  </form>
+
+  <!-- ======================= APERÇU ======================= -->
+  <div class="preview">
+    <div class="page" id="page1">
+      <div class="head">
+        <div class="logo" id="logo"><img src="logo.png" alt="ESMES Business School"></div>
+        <div>
+          <div class="school">ESMES BUSINESS SCHOOL</div>
+          <div class="tag">L'école de la start-up · Campus Lyon Part-Dieu,</div>
+          <div class="addr">49, Boulevard Vivier Merle, 69003, Lyon,</div>
+          <div class="addr">Tél. : 0472506587</div>
+        </div>
+      </div>
+      <hr class="gold-line">
+
+      <div class="date">Lyon, le <span data-f="dateDoc"></span></div>
+      <h2 class="title">ATTESTATION D'INSCRIPTION</h2>
+
+      <p>Madame, Monsieur,</p>
+      <p><span data-f="soussigne"></span>, <b data-f="signataire"></b>, <span data-f="fonction"></span> de l'école
+        <b>ESMES Business School campus de Lyon Part-Dieu</b> certifie que :</p>
+
+      <p>Nom Prénom : <b data-f="nomPrenom"></b></p>
+      <p>Nationalité : <b data-f="nationalite"></b></p>
+
+      <p>Est dûment <span data-f="inscrit"></span> à l'école <b>ESMES Business School</b> campus de <b>Lyon Part-Dieu</b>
+        en tant <span data-f="etudiant"></span> dans le programme suivant :</p>
+      <ul>
+        <li>Nom du programme : <b data-f="programme"></b></li>
+        <li>Nature de la formation : <span data-f="rythme"></span></li>
+        <li>Langue du programme : <span data-f="langue"></span></li>
+        <li>Année académique : <span data-f="annee"></span></li>
+        <li>Durée du programme : <span data-f="duree"></span></li>
+        <li>Coût de la formation : <span data-f="cout"></span> €</li>
+        <li data-show="rncp">Titre inscrit au RNCP : <span data-f="rncp"></span></li>
+      </ul>
+
+      <div id="admissionBlock">
+        <p class="sect">Le processus d'admission <b>a été le suivant</b> :</p>
+        <ul>
+          <li data-show="pDossier">Analyse du dossier d'admission et des pièces demandées (CV, lettres de motivation et de recommandation, bulletins de notes et diplômes obtenus)</li>
+          <li data-show="pTest">Test d'admission (culture générale, français, anglais, test spécifique à la spécialité)</li>
+          <li data-show="pEntretien">Entretien de motivation avec la responsable des admissions</li>
+        </ul>
+      </div>
+
+      <p class="sect">Le processus d'inscription a été finalisé :</p>
+      <ul>
+        <li>Le dossier d'inscription est complet</li>
+        <li>L'acompte de <span data-f="acompte"></span> € a été payé directement sur le compte bancaire de l'établissement</li>
+      </ul>
+
+      <p id="lastText">L'année universitaire débute le <span data-f="rentree"></span>, date à laquelle <span data-f="letudiant"></span> devra être sur le territoire français.
+        <span data-f="ilElle"></span> sera <span data-f="autorise"></span> à arriver jusqu'au <span data-f="arriveeMax"></span> dernier délai, uniquement en cas de difficulté
+        d'obtention du visa. Toute arrivée prévue après cette date entraînera l'annulation de l'inscription.<span data-show="remboursement"> Dans ce cas, et
+        sur présentation du justificatif du Consulat, l'acompte sera intégralement remboursé.</span><span data-show="logement"> Nous mettons à la
+        disposition de <span data-f="letudiant"></span> un service logement pour assurer une arrivée dans les meilleures conditions.</span></p>
+
+      <div class="sign-row" id="lastLine">
+        <div>
+          <div class="name" data-f="signataire"></div>
+          <div data-f="fonction"></div>
+          <div data-f="sigMail"></div>
+          <div>Tél : <span data-f="sigTel"></span></div>
+        </div>
+        <div id="contactBlock">
+          <div>Votre contact :</div>
+          <div class="name" data-f="ctNom"></div>
+          <div data-f="ctFonction"></div>
+          <div data-f="ctMail"></div>
+          <div data-show="ctTel">Tél / WhatsApp : <span data-f="ctTel"></span></div>
+        </div>
+      </div>
+      <div class="sign-zone">
+        <img class="cachet-img" src="cachet.png" alt="" onerror="this.style.display='none'">
+        <img class="sign-img" id="signImg" src="signature.jpg" alt="" onerror="this.style.display='none'">
+      </div>
+
+      <div class="foot" id="foot"></div>
+    </div>
+  </div>
 </div>
+
 <script>
-(function(){
-const form=document.getElementById('form');
-const $=name=>form.elements[name];
-const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const today=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
-const date=v=>{if(!v)return '';const [y,m,d]=v.split('-');return Number(d)+' '+months[Number(m)-1]+' '+y};
-const set=(key,value,placeholder='[à renseigner]')=>document.querySelectorAll('[data-f="'+key+'"]').forEach(el=>{el.textContent=value||placeholder;el.classList.toggle('empty',!value)});
-function render(){
-const first=$('prenom').value.trim(),last=$('nom').value.trim().toLocaleUpperCase('fr-FR');
-set('civilite',$('civilite').value,'');set('identite',[first,last].filter(Boolean).join(' '),'[Prénom NOM]');
-set('nationalite',$('nationalite').value.trim());set('naissance',date($('naissance').value));
-set('numero',$('numero').value.trim());set('formation',$('formation').value.trim());set('niveau',$('niveau').value,'');
-set('anneeEtude',$('anneeEtude').value,'');set('rythme',$('rythme').value,'');set('annee',$('annee').value.trim());
-set('debut',date($('debut').value));set('fin',date($('fin').value));set('dateInscription',date($('dateInscription').value));
-set('dateEmission',date($('dateEmission').value));set('signataire',$('signataire').value.trim());set('signataire2',$('signataire').value.trim());
-set('fonction',$('fonction').value.trim());set('fonction2',$('fonction').value.trim());set('adresse',$('adresse').value.trim());
-set('contact',$('contact').value.trim());set('siren',$('siren').value.trim());
-}
-form.addEventListener('input',render);form.addEventListener('change',render);
-$('dateInscription').value=today();$('dateEmission').value=today();render();
-document.getElementById('print').addEventListener('click',()=>{
-const missing=[];if(!$('prenom').value.trim()||!$('nom').value.trim())missing.push('nom et prénom');
-if(!$('formation').value.trim())missing.push('formation');if(!$('annee').value.trim())missing.push('année académique');
-if(missing.length&&!confirm('Informations manquantes : '+missing.join(', ')+'.\nImprimer quand même ?'))return;
-const old=document.title;document.title='Attestation inscription - '+$('nom').value.trim().toUpperCase()+' '+$('prenom').value.trim();window.print();document.title=old;
-});
-document.getElementById('reset').addEventListener('click',()=>{
-form.reset();$('dateInscription').value=today();$('dateEmission').value=today();render();
-});
+(function () {
+  const form = document.getElementById('form');
+  const $ = (n) => form.elements[n];
+  const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  // Paramètres partagés avec l'attestation d'admission (même navigateur)
+  const ADMISSION_STORE = 'esmes-attestation-settings';
+  const STORE = 'esmes-inscription-settings';
+  const load = (k) => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } };
+
+  // ---------- Catalogue (identique à l'attestation d'admission) ----------
+  const SPECIALITES_BACHELOR = [
+    'Management des Ressources Humaines', 'Business International', 'Marketing Digital et Communication',
+    'Comptabilité et Finance', 'Négociation et Relation Client', 'Informatique', 'Start-up Management', 'Entrepreneuriat Social',
+  ];
+  const FORMATIONS = [
+    { group: 'Bachelors – Bac+1 / Bac+2 / Bac+3', items: SPECIALITES_BACHELOR.map((sp) => (
+      { id: 'Bachelor en ' + sp, type: 'bachelor', spec: sp, levels: ['Bac+1', 'Bac+2', 'Bac+3'], rythme: 'Alternance', duree: '3 ans' })) },
+    { group: 'Bachelors Open – Bac+1 / Bac+2', items: [
+      { id: 'Bachelor Open en Informatique', type: 'open', spec: 'Informatique', levels: ['Bac+1', 'Bac+2'], rythme: 'Initiale', duree: '2 ans' },
+      { id: 'Bachelor Open en Management, Commerce et Gestion des Entreprises', type: 'open', spec: 'Management, Commerce et Gestion des Entreprises', levels: ['Bac+1', 'Bac+2'], rythme: 'Initiale', duree: '2 ans' },
+    ]},
+    { group: 'Masters – Bac+5', items: [
+      ['Management, Commerce et Entrepreneuriat', 'Alternance'], ['Management des Ressources Humaines', 'Alternance'],
+      ['Responsabilité Sociale des Entreprises', 'Alternance'], ['Finance Conseil', 'Initiale'],
+      ['Gestion de la Supply Chain', 'Initiale'], ['Développement Fullstack', 'Initiale'],
+      ['Management de la Santé', 'Alternance'], ['Comptabilité', 'Alternance'],
+    ].map(([sp, r]) => ({ id: 'Master en ' + sp, type: 'master', spec: sp, levels: ['Bac+5'], rythme: r, duree: '2 ans' })) },
+  ];
+  const AUTRE = '__autre__';
+  const findFormation = (id) => { for (const g of FORMATIONS) for (const f of g.items) if (f.id === id) return f; return null; };
+
+  $('formation').innerHTML = '<option value="">— Choisir une formation —</option>' +
+    FORMATIONS.map((g) => `<optgroup label="${g.group}">` + g.items.map((f) => `<option value="${f.id}">${f.id}</option>`).join('') + '</optgroup>').join('') +
+    `<option value="${AUTRE}">Autre (saisie libre)…</option>`;
+
+  function onFormationChange() {
+    const v = $('formation').value;
+    const f = findFormation(v);
+    document.getElementById('autreWrap').hidden = v !== AUTRE;
+    document.getElementById('anneeWrap').style.visibility = f && f.type === 'master' ? 'visible' : 'hidden';
+    const levels = f ? f.levels : ['Bac+1', 'Bac+2', 'Bac+3', 'Bac+5'];
+    const prev = $('niveau').value;
+    $('niveau').innerHTML = levels.map((l) => `<option>${l}</option>`).join('');
+    $('niveau').value = levels.includes(prev) ? prev : levels[levels.length - 1];
+    if (f) { $('rythme').value = f.rythme; $('duree').value = f.duree; }
+  }
+  function programmeLabel() {
+    const v = $('formation').value;
+    if (v === AUTRE) return $('programmeLibre').value.trim();
+    const f = findFormation(v);
+    if (!f) return '';
+    const n = $('niveau').value.replace('Bac+', '');
+    if (f.type === 'bachelor') return `Bachelor ${n} ${f.spec}`;
+    if (f.type === 'open') return `Bachelor Open ${n} ${f.spec}`;
+    return `Master ${$('anneeMaster').value} ${f.spec}`;
+  }
+
+  // ---------- Rendu ----------
+  const fmtDate = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${parseInt(d, 10)} ${MONTHS[parseInt(m, 10) - 1]} ${y}`; };
+  const fmtShort = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${d}/${m}/${y}`; };
+  const fmtMoney = (v) => (v === '' || v == null) ? '' : Number(v).toLocaleString('fr-FR').replace(/ | /g, ' ');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function set(field, value, placeholder) {
+    document.querySelectorAll(`[data-f="${field}"]`).forEach((el) => {
+      el.textContent = value || placeholder || '';
+      el.classList.toggle('empty', !value && !!placeholder);
+    });
+  }
+  const show = (key, on) => document.querySelectorAll(`[data-show="${key}"]`).forEach((el) => (el.hidden = !on));
+
+  function render() {
+    const fem = $('civilite').value === 'Madame';
+    const prenom = $('prenom').value.trim();
+    const nom = $('nom').value.trim().toLocaleUpperCase('fr-FR');
+
+    set('dateDoc', fmtShort($('dateDoc').value), '[date]');
+    set('soussigne', $('soussigne').value);
+    set('signataire', $('signataire').value.trim(), '[Prénom NOM]');
+    set('fonction', $('fonction').value.trim(), '[fonction]');
+    set('nomPrenom', [nom, prenom].filter(Boolean).join(' '), '[NOM Prénom]');
+    set('nationalite', $('nationalite').value.trim(), '[nationalité]');
+    set('inscrit', fem ? 'inscrite' : 'inscrit');
+    set('etudiant', fem ? "qu'étudiante" : "qu'étudiant");
+    set('letudiant', fem ? "l'étudiante" : "l'étudiant");
+    set('ilElle', fem ? "L'étudiante" : "L'étudiant");
+    set('autorise', fem ? 'autorisée' : 'autorisé');
+
+    set('programme', programmeLabel(), '[programme]');
+    set('rythme', $('rythme').value);
+    set('langue', $('langue').value.trim(), '[langue]');
+    set('annee', $('annee').value.trim(), '[année]');
+    set('duree', $('duree').value.trim(), '[durée]');
+    set('cout', fmtMoney($('cout').value), '[montant]');
+    set('acompte', fmtMoney($('acompte').value), '[montant]');
+    set('rncp', $('rncp').value.trim());
+    show('rncp', !!$('rncp').value.trim());
+
+    const steps = ['pDossier', 'pTest', 'pEntretien'];
+    steps.forEach((k) => show(k, $(k).checked));
+    document.getElementById('admissionBlock').hidden = !steps.some((k) => $(k).checked);
+
+    set('rentree', fmtDate($('rentree').value), '[date de rentrée]');
+    set('arriveeMax', fmtDate($('arriveeMax').value), '[date limite]');
+    show('remboursement', $('remboursement').checked);
+    show('logement', $('logement').checked);
+
+    set('sigMail', $('sigMail').value.trim());
+    set('sigTel', $('sigTel').value.trim());
+    const ct = $('ctNom').value.trim();
+    document.getElementById('contactBlock').hidden = !ct;
+    set('ctNom', ct); set('ctFonction', $('ctFonction').value.trim());
+    set('ctMail', $('ctMail').value.trim()); set('ctTel', $('ctTel').value.trim());
+    show('ctTel', !!$('ctTel').value.trim());
+
+    renderFooter();
+    persist();
+    fit();
+  }
+
+  // Pied de page : même contenu que l'attestation d'admission
+  function renderFooter() {
+    const a = load(ADMISSION_STORE);
+    const v = (k, d) => esc((a[k] || d || '').trim());
+    const lines = [
+      ['ESMES Business School', 'Tour Apicil, 49 bd Vivier Merle, 69003 Lyon', `SIREN : ${v('siren', '994 787 059')} RCS Lyon`],
+      ['Tél : 04-72-50-65-87', `Code NAF : ${v('naf', '8542Z - Enseignement supérieur')}`, 'Mail : contact@esmes-lyon.com'],
+      [`NDA : ${v('nda', '84692671169')} / Préfecture de région Auvergne-Rhône-Alpes`, 'www.esmes-lyon.com'],
+      [`Organisme certifié Qualiopi : ${v('qualiopi', 'Actions de formation')}`, `Certificat ${v('qualiopiCert', 'QUA010283')}`],
+    ];
+    document.getElementById('foot').innerHTML = lines.map((l) => `<div class="fl">${l.join(' · ')}</div>`).join('');
+  }
+
+  // Réduit le texte si le contenu déborde sur le pied de page
+  function fit() {
+    const page = document.getElementById('page1');
+    const zone = page.querySelector('.sign-zone');
+    const foot = document.getElementById('foot');
+    let size = 11;
+    page.style.fontSize = size + 'pt';
+    const gap = 3 * 96 / 25.4;
+    while (size > 8 && zone.getBoundingClientRect().bottom > foot.getBoundingClientRect().top - gap) {
+      size -= 0.25;
+      page.style.fontSize = size + 'pt';
+    }
+  }
+
+  // ---------- Paramètres mémorisés ----------
+  function persist() {
+    const s = load(STORE);
+    form.querySelectorAll('[data-persist]').forEach((el) => (s[el.name] = el.value));
+    save(STORE, s);
+  }
+  function applySettings() {
+    const s = load(STORE);
+    form.querySelectorAll('[data-persist]').forEach((el) => { if (s[el.name]) el.value = s[el.name]; });
+    // Logo et signature chargés dans l'attestation d'admission, s'il y en a
+    const a = load(ADMISSION_STORE);
+    if (a.logo) document.querySelector('#logo img').src = a.logo;
+    if (a.sign) document.getElementById('signImg').src = a.sign;
+  }
+
+  function newStudent() {
+    ['prenom', 'nom', 'nationalite', 'formation', 'programmeLibre', 'cout', 'arriveeMax'].forEach((n) => ($(n).value = ''));
+    const d = new Date();
+    $('dateDoc').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    onFormationChange();
+  }
+
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+  $('formation').addEventListener('change', onFormationChange);
+  window.addEventListener('beforeprint', fit);
+
+  document.getElementById('printBtn').addEventListener('click', () => {
+    const missing = [];
+    if (!$('prenom').value.trim() || !$('nom').value.trim()) missing.push('nom / prénom');
+    if (!programmeLabel()) missing.push('programme');
+    if (!$('acompte').value) missing.push('montant de l\'acompte');
+    if (!$('arriveeMax').value) missing.push('date limite d\'arrivée');
+    if (missing.length && !confirm('À vérifier : ' + missing.join(', ') + '.\nImprimer quand même ?')) return;
+    const prev = document.title;
+    document.title = `Attestation inscription - ${$('nom').value.trim().toUpperCase()} ${$('prenom').value.trim()}`.trim();
+    window.print();
+    document.title = prev;
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => { newStudent(); render(); });
+
+  applySettings();
+  newStudent();
+  render();
 })();
 </script>
 </body>
