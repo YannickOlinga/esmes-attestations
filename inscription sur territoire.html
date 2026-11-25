@@ -105,6 +105,9 @@
         <div><label>Prénom(s)</label><input name="prenom" placeholder="Prénom(s)"></div>
         <div><label>Nom</label><input name="nom" placeholder="NOM"></div>
       </div>
+      <div class="row">
+        <div><label>Date de naissance</label><input type="date" name="naissance"></div>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -134,7 +137,7 @@
         <div><label>Coût de la formation (€)</label><input type="number" name="cout" min="0" step="1" placeholder="ex. : 8500"></div>
         <div><label>Acompte payé (€)</label><input type="number" name="acompte" min="0" step="1" value="3000"></div>
       </div>
-      <label>Titre inscrit au RNCP (laisser vide pour masquer)</label>
+      <label>Titre certifié par l'Etat  (laisser vide pour masquer)</label>
       <input name="rncp" value="RNCP37873 – Concepteur développeur d'applications – France Compétences (francecompetences.fr) Titre à finalité professionnelle de niveau 6">
     </fieldset>
 
@@ -209,6 +212,7 @@
 
       <p>Nom Prénom : <b data-f="nomPrenom"></b></p>
       <p>Nationalité : <b data-f="nationalite"></b></p>
+      <p>Date de naissance : <b data-f="naissance"></b></p>
 
       <p>Est dûment <span data-f="inscrit"></span> à l'école <b>ESMES Business School</b> campus de <b>Lyon Part-Dieu</b>
         en tant <span data-f="etudiant"></span> dans le programme suivant :</p>
@@ -219,7 +223,7 @@
         <li>Année académique : <span data-f="annee"></span></li>
         <li>Durée du programme : <span data-f="duree"></span></li>
         <li>Coût de la formation : <span data-f="cout"></span> €</li>
-        <li data-show="rncp">Titre inscrit au RNCP : <span data-f="rncp"></span></li>
+        <li data-show="rncp">Titre certifié RNCP par l'État : <span data-f="rncp"></span></li>
       </ul>
 
       <div id="admissionBlock">
@@ -238,7 +242,7 @@
 
       <p id="lastText">L'année universitaire débute le <span data-f="rentree"></span>.
         L'étudiant devra trouver son entreprise d'accueil dans un délai de 2 mois à compter de la date de délivrance de la présente admission. À défaut, il sera automatiquement réorienté en formation initiale. <br>
-        En foi de quoi, cette attestation est delivrée  pour servir et valoir ce que de droit.     <div class="sign-row" id="lastLine">
+        En foi de quoi, cette attestation est delivrée  pour servir et valoir ce que de droit.<div class="sign-row" id="lastLine">
         <div>
           <div class="name" data-f="signataire"></div>
           <div data-f="fonction"></div>
@@ -346,6 +350,7 @@
     set('fonction', $('fonction').value.trim(), '[fonction]');
     set('nomPrenom', [nom, prenom].filter(Boolean).join(' '), '[NOM Prénom]');
     set('nationalite', $('nationalite').value.trim(), '[nationalité]');
+    set('naissance', fmtDate($('naissance').value), '[date de naissance]');
     set('inscrit', fem ? 'inscrite' : 'inscrit');
     set('etudiant', fem ? "qu'étudiante" : "qu'étudiant");
     set('letudiant', fem ? "l'étudiante" : "l'étudiant");
@@ -427,7 +432,7 @@
   }
 
   function newStudent() {
-    ['prenom', 'nom', 'nationalite', 'formation', 'programmeLibre', 'cout', 'arriveeMax'].forEach((n) => ($(n).value = ''));
+    ['prenom', 'nom', 'nationalite', 'naissance', 'formation', 'programmeLibre', 'cout', 'arriveeMax'].forEach((n) => ($(n).value = ''));
     const d = new Date();
     $('dateDoc').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     onFormationChange();
