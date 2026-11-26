@@ -213,6 +213,7 @@
       <p>Nom Prénom : <b data-f="nomPrenom"></b></p>
       <p>Nationalité : <b data-f="nationalite"></b></p>
       <p>Date de naissance : <b data-f="naissance"></b></p>
+      <p>Âge : <b data-f="age"></b></p>
 
       <p>Est dûment <span data-f="inscrit"></span> à l'école <b>ESMES Business School</b> campus de <b>Lyon Part-Dieu</b>
         en tant <span data-f="etudiant"></span> dans le programme suivant :</p>
@@ -223,7 +224,7 @@
         <li>Année académique : <span data-f="annee"></span></li>
         <li>Durée du programme : <span data-f="duree"></span></li>
         <li>Coût de la formation : <span data-f="cout"></span> €</li>
-        <li data-show="rncp">Titre certifié RNCP par l'État : <span data-f="rncp"></span></li>
+        <li data-show="rncp">Titre certifié  par l'État : <span data-f="rncp"></span></li>
       </ul>
 
       <div id="admissionBlock">
@@ -328,6 +329,15 @@
 
   // ---------- Rendu ----------
   const fmtDate = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${parseInt(d, 10)} ${MONTHS[parseInt(m, 10) - 1]} ${y}`; };
+  // Âge à la date du document (ou aujourd'hui si non renseignée)
+  const calcAge = (birth, ref) => {
+    if (!birth) return '';
+    const [by, bm, bd] = birth.split('-').map(Number);
+    const r = ref ? ref.split('-').map(Number) : [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()];
+    let a = r[0] - by;
+    if (r[1] < bm || (r[1] === bm && r[2] < bd)) a--;
+    return a >= 0 ? `${a} an${a > 1 ? 's' : ''}` : '';
+  };
   const fmtShort = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${d}/${m}/${y}`; };
   const fmtMoney = (v) => (v === '' || v == null) ? '' : Number(v).toLocaleString('fr-FR').replace(/ | /g, ' ');
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -351,6 +361,7 @@
     set('nomPrenom', [nom, prenom].filter(Boolean).join(' '), '[NOM Prénom]');
     set('nationalite', $('nationalite').value.trim(), '[nationalité]');
     set('naissance', fmtDate($('naissance').value), '[date de naissance]');
+    set('age', calcAge($('naissance').value, $('dateDoc').value), '[âge]');
     set('inscrit', fem ? 'inscrite' : 'inscrit');
     set('etudiant', fem ? "qu'étudiante" : "qu'étudiant");
     set('letudiant', fem ? "l'étudiante" : "l'étudiant");

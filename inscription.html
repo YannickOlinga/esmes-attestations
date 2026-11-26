@@ -105,6 +105,9 @@
         <div><label>Prénom(s)</label><input name="prenom" placeholder="Prénom(s)"></div>
         <div><label>Nom</label><input name="nom" placeholder="NOM"></div>
       </div>
+      <div class="row">
+        <div><label>Date de naissance</label><input type="date" name="naissance"></div>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -134,7 +137,7 @@
         <div><label>Coût de la formation (€)</label><input type="number" name="cout" min="0" step="1" placeholder="ex. : 8500"></div>
         <div><label>Acompte payé (€)</label><input type="number" name="acompte" min="0" step="1" value="3000"></div>
       </div>
-      <label>Titre inscrit au RNCP (laisser vide pour masquer)</label>
+      <label>Titre certifié par l'Etat  (laisser vide pour masquer)</label>
       <input name="rncp" value="RNCP37873 – Concepteur développeur d'applications – France Compétences (francecompetences.fr) Titre à finalité professionnelle de niveau 6">
     </fieldset>
 
@@ -209,6 +212,8 @@
 
       <p>Nom Prénom : <b data-f="nomPrenom"></b></p>
       <p>Nationalité : <b data-f="nationalite"></b></p>
+      <p>Date de naissance : <b data-f="naissance"></b></p>
+      <p>Âge : <b data-f="age"></b></p>
 
       <p>Est dûment <span data-f="inscrit"></span> à l'école <b>ESMES Business School</b> campus de <b>Lyon Part-Dieu</b>
         en tant <span data-f="etudiant"></span> dans le programme suivant :</p>
@@ -219,7 +224,7 @@
         <li>Année académique : <span data-f="annee"></span></li>
         <li>Durée du programme : <span data-f="duree"></span></li>
         <li>Coût de la formation : <span data-f="cout"></span> €</li>
-        <li data-show="rncp">Titre inscrit au RNCP : <span data-f="rncp"></span></li>
+        <li data-show="rncp">Titre certifié par l'Etat : <span data-f="rncp"></span></li>
       </ul>
 
       <div id="admissionBlock">
@@ -327,6 +332,15 @@
 
   // ---------- Rendu ----------
   const fmtDate = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${parseInt(d, 10)} ${MONTHS[parseInt(m, 10) - 1]} ${y}`; };
+  // Âge à la date du document (ou aujourd'hui si non renseignée)
+  const calcAge = (birth, ref) => {
+    if (!birth) return '';
+    const [by, bm, bd] = birth.split('-').map(Number);
+    const r = ref ? ref.split('-').map(Number) : [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()];
+    let a = r[0] - by;
+    if (r[1] < bm || (r[1] === bm && r[2] < bd)) a--;
+    return a >= 0 ? `${a} an${a > 1 ? 's' : ''}` : '';
+  };
   const fmtShort = (v) => { if (!v) return ''; const [y, m, d] = v.split('-'); return `${d}/${m}/${y}`; };
   const fmtMoney = (v) => (v === '' || v == null) ? '' : Number(v).toLocaleString('fr-FR').replace(/ | /g, ' ');
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -349,6 +363,8 @@
     set('fonction', $('fonction').value.trim(), '[fonction]');
     set('nomPrenom', [nom, prenom].filter(Boolean).join(' '), '[NOM Prénom]');
     set('nationalite', $('nationalite').value.trim(), '[nationalité]');
+    set('naissance', fmtDate($('naissance').value), '[date de naissance]');
+    set('age', calcAge($('naissance').value, $('dateDoc').value), '[âge]');
     set('inscrit', fem ? 'inscrite' : 'inscrit');
     set('etudiant', fem ? "qu'étudiante" : "qu'étudiant");
     set('letudiant', fem ? "l'étudiante" : "l'étudiant");
@@ -430,7 +446,7 @@
   }
 
   function newStudent() {
-    ['prenom', 'nom', 'nationalite', 'formation', 'programmeLibre', 'cout', 'arriveeMax'].forEach((n) => ($(n).value = ''));
+    ['prenom', 'nom', 'nationalite', 'naissance', 'formation', 'programmeLibre', 'cout', 'arriveeMax'].forEach((n) => ($(n).value = ''));
     const d = new Date();
     $('dateDoc').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     onFormationChange();
